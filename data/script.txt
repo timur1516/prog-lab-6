@@ -1,0 +1,15 @@
+info
+add
+name3
+5
+5
+2
+01.02.2021
+01.02.2022
+FIRED
+125
+RED
+VATICAN
+execute_script C:\Users\hache\IdeaProjects\Lab6\data\script1.txt
+show
+clear
