@@ -44,6 +44,9 @@ public class FilterLessThanEndDateCommand extends UserCommand {
      */
     @Override
     public ExecuteCommandResponce execute() {
+        if(this.collectionController.getCollection().isEmpty()){
+            return new ExecuteCommandResponce(ResultState.SUCCESS, "Collection is empty!");
+        }
         return new ExecuteCommandResponce(ResultState.SUCCESS,
                 this.collectionController.getLessThanEndDate(endDate).toString());
     }

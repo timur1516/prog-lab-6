@@ -48,6 +48,10 @@ public class UpdateByIdCommand extends UserCommand {
      */
     @Override
     public ExecuteCommandResponce execute() {
+        if(!this.collectionController.containsId(id)){
+            return new ExecuteCommandResponce(ResultState.EXCEPTION,
+                    new NoSuchElementException("No element with such id!"));
+        }
         this.collectionController.update(id, worker);
         return new ExecuteCommandResponce(ResultState.SUCCESS,
                 "Element updated successfully!");

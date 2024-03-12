@@ -46,6 +46,9 @@ public class RemoveGreaterCommand extends UserCommand {
      */
     @Override
     public ExecuteCommandResponce execute() {
+        if(this.collectionController.getCollection().isEmpty()){
+            return new ExecuteCommandResponce(ResultState.SUCCESS, "Collection is empty!");
+        }
         int elementsRemoved = this.collectionController.removeGreater(worker);
         return new ExecuteCommandResponce(ResultState.SUCCESS,
                 String.format("Successfully removed %d elements!", elementsRemoved));
