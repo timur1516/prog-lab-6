@@ -5,16 +5,16 @@ import common.Exceptions.SendingDataException;
 
 import java.io.*;
 import java.net.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
 
 public class UDPClient {
-    private DatagramSocket ds;
-    private InetAddress host;
-    private int port;
+    DatagramChannel dc;
+    InetSocketAddress addr;
 
-    UDPClient(InetAddress host, int port) throws SocketException {
-        this.host = host;
-        this.port = port;
-        ds = new DatagramSocket();
+    UDPClient(InetAddress host, int port) throws IOException {
+        this.addr = new InetSocketAddress(host, port);
+        dc = DatagramChannel.open();
     }
 
     private byte[] serialize(Serializable o) throws IOException {
@@ -33,14 +33,14 @@ public class UDPClient {
 
     private byte[] receive(int len) throws IOException {
         byte arr[] = new byte[len];
-        DatagramPacket dp = new DatagramPacket(arr, len);
-        ds.receive(dp);
-        return dp.getData();
+        ByteBuffer buf = ByteBuffer.wrap(arr);
+        dc.receive(buf);
+        return buf.array();
     }
 
     private void send(byte[] arr) throws IOException {
-        DatagramPacket dp = new DatagramPacket(arr, arr.length, this.host, this.port);
-        ds.send(dp);
+        ByteBuffer buf = ByteBuffer.wrap(arr);
+        dc.send(buf, addr);
     }
 
     public Serializable receiveObject() throws ReceivingDataException {

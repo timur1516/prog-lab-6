@@ -1,5 +1,6 @@
 package client;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -34,9 +35,7 @@ public class Main {
         workerReader = new WorkerReader();
         try {
             client = new UDPClient(InetAddress.getLocalHost(), 8081);
-        } catch (SocketException e) {
-            throw new RuntimeException(e);
-        } catch (UnknownHostException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
         commandsController = new CommandsController(workerReader, client);
