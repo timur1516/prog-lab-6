@@ -36,17 +36,9 @@ public class ExitCommand extends UserCommand {
     public ExecuteCommandResponce execute() {
         YesNoQuestionAsker questionAsker = new YesNoQuestionAsker("Do you want to exit?");
         if(questionAsker.ask()) {
-            try {
-                this.client.sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new ExecuteCommandRequest("save", new ArrayList<>())));
-            } catch (SendingDataException e) {
-                return new ExecuteCommandResponce(ResultState.EXCEPTION, e.getMessage());
-            }
-            try {
-                client.receiveObject();
-            } catch (ReceivingDataException e) {}
             System.exit(0);
         }
-        return null;
+        return new ExecuteCommandResponce(ResultState.SUCCESS, "Exit canceled");
     }
 
     /**
