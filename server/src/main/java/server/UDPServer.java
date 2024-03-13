@@ -1,19 +1,30 @@
 package server;
 
 import java.io.*;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
+import java.net.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
+import java.nio.channels.DatagramChannel;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 
 public class UDPServer {
-    private DatagramSocket ds;
+    DatagramChannel dc;
+    SocketAddress addr;
 
-    private int clientPort = -1;
-    private InetAddress clientHost = null;
+    UDPServer(int serverPort) {
+        addr = new InetSocketAddress(serverPort);
 
-    UDPServer(int serverPort) throws SocketException {
-        ds = new DatagramSocket(serverPort);
+    }
+
+    public void open() throws IOException {
+        this.dc = DatagramChannel.open();
+        this.dc.bind(addr);
+        this.dc.configureBlocking(false);
+    }
+
+    public void registerSelector(Selector selector, int ops) throws ClosedChannelException {
+        this.dc.register(selector, ops);
     }
 
     private byte[] serialize(Serializable o) throws IOException {
@@ -31,24 +42,19 @@ public class UDPServer {
     }
 
     private byte[] receive(int len) throws IOException {
-        byte arr[] = new byte[len];
-        DatagramPacket dp = new DatagramPacket(arr, len);
-        ds.receive(dp);
-
-        this.clientHost = dp.getAddress();
-        this.clientPort = dp.getPort();
-
-        return dp.getData();
+        ByteBuffer buf = ByteBuffer.allocate(len);
+        addr = this.dc.receive(buf);
+        return buf.array();
     }
 
     private void send(byte[] arr) throws IOException {
-        if(this.clientPort == -1 && this.clientHost == null) throw new RuntimeException("Unknown client!");
-        DatagramPacket dp = new DatagramPacket(arr, arr.length, this.clientHost, this.clientPort);
-        ds.send(dp);
+         ByteBuffer buf = ByteBuffer.wrap(arr);
+         this.dc.send(buf, addr);
     }
 
     public Serializable receiveObject() throws IOException, ClassNotFoundException {
-        Integer dataLen = (Integer) deserialize(receive(81));
+        byte dataLenArr[] = receive(81);
+        Integer dataLen = (Integer) deserialize(dataLenArr);
         return deserialize(receive(dataLen));
     }
 

@@ -1,5 +1,6 @@
 package server.Commands;
 
+import common.Exceptions.WrongAmountOfArgumentsException;
 import common.UserCommand;
 import common.requests.ExecuteCommandResponce;
 import common.requests.ResultState;
@@ -54,6 +55,13 @@ public class SaveCommand extends UserCommand {
         } catch (IOException e) {
             return new ExecuteCommandResponce(ResultState.EXCEPTION,
                     new IOException("An error occurred while writing to the file!"));
+        }
+    }
+
+    @Override
+    public void initCommandArgs(ArrayList<Serializable> arguments) throws WrongAmountOfArgumentsException {
+        if(!arguments.isEmpty()){
+            throw new WrongAmountOfArgumentsException("Wrong amount of arguments!", 0, arguments.size());
         }
     }
 }

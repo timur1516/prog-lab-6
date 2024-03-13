@@ -33,7 +33,7 @@ public class PrintFieldDescendingSalaryCommand extends UserCommand {
     @Override
     public ExecuteCommandResponce execute() {
         try {
-            this.client.sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new ExecuteCommandRequest(super.getName(), new ArrayList<>())));
+            this.client.sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new PackedCommand(super.getName(), new ArrayList<>())));
             return (ExecuteCommandResponce) this.client.receiveObject();
         }
         catch (Exception e) {

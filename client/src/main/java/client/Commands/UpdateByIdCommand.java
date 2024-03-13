@@ -12,10 +12,8 @@ import common.Validators.WorkerValidators;
 import common.requests.*;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 
 /**
  * Class with realization of update command
@@ -66,7 +64,7 @@ public class UpdateByIdCommand extends UserCommand {
             ArrayList<Serializable> arguments = new ArrayList<>();
             arguments.add(id);
             arguments.add(worker);
-            client.sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new ExecuteCommandRequest(super.getName(), arguments)));
+            client.sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new PackedCommand(super.getName(), arguments)));
             return (ExecuteCommandResponce) client.receiveObject();
         } catch (Exception e){
             return new ExecuteCommandResponce(ResultState.EXCEPTION, e);

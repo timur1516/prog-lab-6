@@ -3,8 +3,8 @@ package client.Readers;
 import java.time.LocalDateTime;
 
 import common.Parsers.WorkerParsers;
-import common.Console;
-import client.UI.YesNoQuestionAsker;
+import common.UI.Console;
+import common.UI.YesNoQuestionAsker;
 import common.Collection.*;
 import common.Constants;
 import common.Exceptions.InvalidDataException;

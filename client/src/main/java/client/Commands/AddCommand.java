@@ -47,7 +47,7 @@ public class AddCommand extends UserCommand {
             Worker worker = this.workerReader.readWorker();
             ArrayList<Serializable> arguments = new ArrayList<>();
             arguments.add(worker);
-            this.client.sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new ExecuteCommandRequest(super.getName(), arguments)));
+            this.client.sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new PackedCommand(super.getName(), arguments)));
             return (ExecuteCommandResponce) this.client.receiveObject();
         }
         catch (Exception e) {

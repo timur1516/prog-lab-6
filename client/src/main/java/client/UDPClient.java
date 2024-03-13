@@ -7,14 +7,22 @@ import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
+import java.util.Arrays;
 
 public class UDPClient {
-    DatagramChannel dc;
-    InetSocketAddress addr;
+    DatagramSocket ds;
+    InetAddress host;
+    int port;
 
-    UDPClient(InetAddress host, int port) throws IOException {
-        this.addr = new InetSocketAddress(host, port);
-        dc = DatagramChannel.open();
+    UDPClient(InetAddress host, int port) {
+        this.host = host;
+        this.port = port;
+
+    }
+
+    public void open() throws SocketException {
+        this.ds = new DatagramSocket();
+        this.ds.setSoTimeout(1000);
     }
 
     private byte[] serialize(Serializable o) throws IOException {
@@ -33,14 +41,14 @@ public class UDPClient {
 
     private byte[] receive(int len) throws IOException {
         byte arr[] = new byte[len];
-        ByteBuffer buf = ByteBuffer.wrap(arr);
-        dc.receive(buf);
-        return buf.array();
+        DatagramPacket dp = new DatagramPacket(arr, len);
+        this.ds.receive(dp);
+        return arr;
     }
 
     private void send(byte[] arr) throws IOException {
-        ByteBuffer buf = ByteBuffer.wrap(arr);
-        dc.send(buf, addr);
+        DatagramPacket dp = new DatagramPacket(arr, arr.length, this.host, this.port);
+        this.ds.send(dp);
     }
 
     public Serializable receiveObject() throws ReceivingDataException {

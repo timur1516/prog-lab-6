@@ -1,10 +1,13 @@
-package client.Commands;
+package server.Commands;
 
-import client.UDPClient;
-import common.UI.YesNoQuestionAsker;
+import common.Exceptions.ExitingException;
 import common.Exceptions.WrongAmountOfArgumentsException;
+import common.UI.YesNoQuestionAsker;
 import common.UserCommand;
-import common.requests.*;
+import common.requests.ExecuteCommandResponce;
+import common.requests.PackedCommand;
+import common.requests.ResultState;
+import common.Controllers.CommandsController;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -15,14 +18,14 @@ import java.util.ArrayList;
  * @see UserCommand
  */
 public class ExitCommand extends UserCommand {
-    private UDPClient client;
+    private CommandsController commandsController;
     /**
      * ExitCommand constructor
      * <p> Firstly it initializes super constructor by command name, arguments and description
      */
-    public ExitCommand(UDPClient client) {
+    public ExitCommand(CommandsController commandsController) {
         super("exit", "stop program without saving collection");
-        this.client = client;
+        this.commandsController = commandsController;
     }
 
     /**
@@ -34,6 +37,16 @@ public class ExitCommand extends UserCommand {
     public ExecuteCommandResponce execute() {
         YesNoQuestionAsker questionAsker = new YesNoQuestionAsker("Do you want to exit?");
         if(questionAsker.ask()) {
+            try {
+                UserCommand saveCommad = this.commandsController
+                        .launchCommand(new PackedCommand("save", new ArrayList<>()));
+                ExecuteCommandResponce responce = saveCommad.execute();
+                if(responce.state() == ResultState.EXCEPTION) throw (Exception) responce.data();
+            } catch (Exception e) {
+                String message = "Collection wasn't saved!\n" +
+                        e.getMessage() + "\n Exit canceled!";
+                return new ExecuteCommandResponce(ResultState.EXCEPTION, new ExitingException(message));
+            }
             System.exit(0);
         }
         return new ExecuteCommandResponce(ResultState.SUCCESS, "Exit canceled");

@@ -46,7 +46,7 @@ public class RemoveByIdCommand extends UserCommand {
             ArrayList<Serializable> arguments = new ArrayList<>();
             arguments.add(id);
             this.client.sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND,
-                    new ExecuteCommandRequest(super.getName(), arguments)));
+                    new PackedCommand(super.getName(), arguments)));
             return (ExecuteCommandResponce) this.client.receiveObject();
         }
         catch (Exception e) {

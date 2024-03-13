@@ -11,7 +11,7 @@ import common.requests.ExecuteCommandResponce;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
-import common.Console;
+import common.UI.Console;
 import common.requests.ResultState;
 
 /**

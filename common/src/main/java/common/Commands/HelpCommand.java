@@ -1,6 +1,6 @@
-package client.Commands;
+package common.Commands;
 
-import client.Controllers.CommandsController;
+import common.Controllers.CommandsController;
 import common.Exceptions.WrongAmountOfArgumentsException;
 import common.UserCommand;
 import common.requests.ExecuteCommandResponce;

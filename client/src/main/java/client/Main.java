@@ -1,16 +1,19 @@
 package client;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.*;
 
-import client.Controllers.CommandsController;
+import client.Commands.*;
+import common.Commands.HelpCommand;
+import common.Controllers.CommandsController;
 import client.Readers.WorkerReader;
-import common.Console;
+import common.UI.CommandReader;
+import common.UI.Console;
 import common.UserCommand;
 import common.requests.ExecuteCommandResponce;
+import common.requests.PackedCommand;
 
 /**
  * Main app class
@@ -33,12 +36,38 @@ public class Main {
     public static void main(String[] args) {
         Console.getInstance().setScanner(new Scanner(System.in));
         workerReader = new WorkerReader();
+
         try {
             client = new UDPClient(InetAddress.getLocalHost(), 8081);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            client.open();
+        } catch (UnknownHostException e) {
+            Console.getInstance().printError("Server host was not found!");
+            System.exit(0);
+        } catch (SocketException e) {
+            Console.getInstance().printError("Error while starting client!");
+            System.exit(0);
         }
-        commandsController = new CommandsController(workerReader, client);
+
+        commandsController = new CommandsController();
+        commandsController.setCommandsList(
+                new ArrayList<>(Arrays.asList(
+                        new HelpCommand(commandsController),
+                        new InfoCommand(client),
+                        new ShowCommand(client),
+                        new AddCommand(workerReader, client),
+                        new UpdateByIdCommand(workerReader, client),
+                        new RemoveByIdCommand(client),
+                        new ClearCommand(client),
+                        new ExecuteScriptCommand(),
+                        new ExitCommand(client),
+                        new RemoveFirstCommand(client),
+                        new RemoveGreaterCommand(workerReader, client),
+                        new RemoveLowerCommand(workerReader, client),
+                        new MinBySalaryCommand(client),
+                        new FilterLessThanEndDateCommand(workerReader, client),
+                        new PrintFieldDescendingSalaryCommand(client)
+                ))
+        );
         interactiveMode();
     }
 
@@ -48,14 +77,10 @@ public class Main {
      */
     public static void scriptMode() throws Exception {
         while(Console.getInstance().hasNextLine()) {
-            String s = Console.getInstance().readLine();
-            String[] input = (s.trim() + " ").split(" ");
-            if(input.length == 0) continue;
-            String commandName = input[0];
-            Console.getInstance().printLn(commandName);
-            String[] commandArgs = Arrays.copyOfRange(input, 1, input.length);
+            PackedCommand packedCommand = CommandReader.getInstance().readCommand();
+            Console.getInstance().printLn(packedCommand.commandName());
 
-            UserCommand command = commandsController.launchCommand(commandName, commandArgs);
+            UserCommand command = commandsController.launchCommand(packedCommand);
             ExecuteCommandResponce responce = command.execute();
             switch (responce.state()){
                 case SUCCESS:
@@ -75,15 +100,11 @@ public class Main {
      */
     public static void interactiveMode(){
         while(Console.getInstance().hasNextLine()) {
-            String s = Console.getInstance().readLine();
-            String[] input = (s.trim() + " ").split(" ");
-            if(input.length == 0) continue;
-            String commandName = input[0];
-            String[] commandArgs = Arrays.copyOfRange(input, 1, input.length);
-
+            PackedCommand packedCommand = CommandReader.getInstance().readCommand();
+            if(packedCommand == null) continue;
             UserCommand command;
             try {
-                command = commandsController.launchCommand(commandName, commandArgs);
+                command = commandsController.launchCommand(packedCommand);
             }
             catch (Exception e){
                 Console.getInstance().printError(e.getMessage());

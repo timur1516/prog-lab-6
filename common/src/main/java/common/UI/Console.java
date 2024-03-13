@@ -1,4 +1,4 @@
-package common;
+package common.UI;
 
 import java.util.Scanner;
 
@@ -6,7 +6,7 @@ import java.util.Scanner;
  * Singleton class to handle input and output
  */
 public class Console {
-    private static Console CONSOLE;
+    private static Console CONSOLE = null;
     /**
      * Scanner to handle user input
      */

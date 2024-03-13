@@ -53,7 +53,7 @@ public class FilterLessThanEndDateCommand extends UserCommand {
             LocalDateTime endDate = workerReader.readEndDate();
             ArrayList<Serializable> arguments = new ArrayList<>();
             arguments.add(endDate);
-            client.sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new ExecuteCommandRequest(super.getName(), arguments)));
+            client.sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new PackedCommand(super.getName(), arguments)));
             return (ExecuteCommandResponce) client.receiveObject();
         } catch (Exception e){
             return new ExecuteCommandResponce(ResultState.EXCEPTION, e);

@@ -1,5 +1,4 @@
-package client.UI;
-import common.Console;
+package common.UI;
 import common.Constants;
 /**
  * Class which is used to ask user yes\no question
