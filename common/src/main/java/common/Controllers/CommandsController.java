@@ -2,8 +2,8 @@ package common.Controllers;
 
 import common.Exceptions.InvalidDataException;
 import common.Exceptions.WrongAmountOfArgumentsException;
-import common.UserCommand;
-import common.requests.PackedCommand;
+import common.Commands.UserCommand;
+import common.net.requests.PackedCommand;
 
 import java.util.ArrayList;
 import java.util.NoSuchElementException;

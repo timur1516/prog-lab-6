@@ -5,8 +5,8 @@ import client.UDPClient;
 import common.Collection.Worker;
 import common.Constants;
 import common.Exceptions.WrongAmountOfArgumentsException;
-import common.UserCommand;
-import common.requests.*;
+import common.Commands.UserCommand;
+import common.net.requests.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,17 +22,14 @@ public class RemoveGreaterCommand extends UserCommand {
      */
     private WorkerReader workerReader;
 
-    private UDPClient client;
-
     /**
      * RemoveGreaterCommand constructor
      * <p> Firstly it initializes super constructor by command name, arguments and description
      * @param workerReader
      */
-    public RemoveGreaterCommand(WorkerReader workerReader, UDPClient client) {
+    public RemoveGreaterCommand(WorkerReader workerReader) {
         super("remove_greater", "{element}", "remove all elements which are greater than given");
         this.workerReader = workerReader;
-        this.client = client;
     }
 
     /**
@@ -45,8 +42,8 @@ public class RemoveGreaterCommand extends UserCommand {
     @Override
     public ExecuteCommandResponce execute() {
         try {
-            client.sendObject(new ClientRequest(ClientRequestType.IS_COLLECTION_EMPTY, null));
-            if ((boolean)(client.receiveObject())) {
+            UDPClient.getInstance().sendObject(new ClientRequest(ClientRequestType.IS_COLLECTION_EMPTY, null));
+            if ((boolean)(UDPClient.getInstance().receiveObject())) {
                 if (Constants.SCRIPT_MODE) {
                     workerReader.readWorker();
                 }
@@ -55,8 +52,8 @@ public class RemoveGreaterCommand extends UserCommand {
             Worker worker = this.workerReader.readWorker();
             ArrayList<Serializable> arguments = new ArrayList<>();
             arguments.add(worker);
-            client.sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new PackedCommand(super.getName(), arguments)));
-            return (ExecuteCommandResponce) client.receiveObject();
+            UDPClient.getInstance().sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new PackedCommand(super.getName(), arguments)));
+            return (ExecuteCommandResponce) UDPClient.getInstance().receiveObject();
         } catch (Exception e){
             return new ExecuteCommandResponce(ResultState.EXCEPTION, e);
         }

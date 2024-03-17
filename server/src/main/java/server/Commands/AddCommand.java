@@ -1,12 +1,10 @@
 package server.Commands;
 
 import common.Collection.Worker;
-import common.Exceptions.InvalidDataException;
-import common.Exceptions.WrongAmountOfArgumentsException;
-import common.ICommand;
-import common.UserCommand;
-import common.requests.ExecuteCommandResponce;
-import common.requests.ResultState;
+import common.Commands.ICommand;
+import common.Commands.UserCommand;
+import common.net.requests.ExecuteCommandResponce;
+import common.net.requests.ResultState;
 import server.Controllers.CollectionController;
 
 import java.io.Serializable;
@@ -23,7 +21,9 @@ public class AddCommand extends UserCommand {
      * Controller of collection which is used to add new element
      */
     private CollectionController collectionController;
-
+    /**
+     * Worker object to add
+     */
     private Worker worker;
 
     /**

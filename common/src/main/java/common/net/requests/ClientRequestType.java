@@ -1,4 +1,4 @@
-package common.requests;
+package common.net.requests;
 
 public enum ClientRequestType {
     EXECUTE_COMMAND,

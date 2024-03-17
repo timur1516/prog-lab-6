@@ -1,9 +1,9 @@
 package server.Commands;
 
-import common.ICommand;
-import common.UserCommand;
-import common.requests.ExecuteCommandResponce;
-import common.requests.ResultState;
+import common.Commands.ICommand;
+import common.Commands.UserCommand;
+import common.net.requests.ExecuteCommandResponce;
+import common.net.requests.ResultState;
 import server.Controllers.CollectionController;
 
 /**

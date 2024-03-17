@@ -2,9 +2,8 @@ package common.Commands;
 
 import common.Controllers.CommandsController;
 import common.Exceptions.WrongAmountOfArgumentsException;
-import common.UserCommand;
-import common.requests.ExecuteCommandResponce;
-import common.requests.ResultState;
+import common.net.requests.ExecuteCommandResponce;
+import common.net.requests.ResultState;
 
 import java.io.Serializable;
 import java.util.ArrayList;

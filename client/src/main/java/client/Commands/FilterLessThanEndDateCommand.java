@@ -4,8 +4,8 @@ import client.Readers.WorkerReader;
 import client.UDPClient;
 import common.Constants;
 import common.Exceptions.WrongAmountOfArgumentsException;
-import common.UserCommand;
-import common.requests.*;
+import common.Commands.UserCommand;
+import common.net.requests.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -17,7 +17,6 @@ import java.util.ArrayList;
  * @see UserCommand
  */
 public class FilterLessThanEndDateCommand extends UserCommand {
-    private UDPClient client;
     /**
      * Worker reader which is used to read endDate
      */
@@ -28,10 +27,9 @@ public class FilterLessThanEndDateCommand extends UserCommand {
      * <p> Firstly it initializes super constructor by command name, arguments and description
      * @param workerReader
      */
-    public FilterLessThanEndDateCommand(WorkerReader workerReader, UDPClient client) {
+    public FilterLessThanEndDateCommand(WorkerReader workerReader) {
         super("filter_less_than_end_date", "endDate", "print all elements whose endDate is less than given");
         this.workerReader = workerReader;
-        this.client = client;
     }
 
     /**
@@ -43,8 +41,8 @@ public class FilterLessThanEndDateCommand extends UserCommand {
     @Override
     public ExecuteCommandResponce execute() {
         try {
-            client.sendObject(new ClientRequest(ClientRequestType.IS_COLLECTION_EMPTY, null));
-            if (((boolean)client.receiveObject())) {
+            UDPClient.getInstance().sendObject(new ClientRequest(ClientRequestType.IS_COLLECTION_EMPTY, null));
+            if (((boolean)UDPClient.getInstance().receiveObject())) {
                 if (Constants.SCRIPT_MODE) {
                     workerReader.readEndDate();
                 }
@@ -53,8 +51,8 @@ public class FilterLessThanEndDateCommand extends UserCommand {
             LocalDateTime endDate = workerReader.readEndDate();
             ArrayList<Serializable> arguments = new ArrayList<>();
             arguments.add(endDate);
-            client.sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new PackedCommand(super.getName(), arguments)));
-            return (ExecuteCommandResponce) client.receiveObject();
+            UDPClient.getInstance().sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new PackedCommand(super.getName(), arguments)));
+            return (ExecuteCommandResponce) UDPClient.getInstance().receiveObject();
         } catch (Exception e){
             return new ExecuteCommandResponce(ResultState.EXCEPTION, e);
         }

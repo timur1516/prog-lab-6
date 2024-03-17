@@ -4,9 +4,9 @@ import client.UDPClient;
 import common.Exceptions.InvalidDataException;
 import common.Exceptions.WrongAmountOfArgumentsException;
 import common.Parsers.WorkerParsers;
-import common.UserCommand;
+import common.Commands.UserCommand;
 import common.Validators.WorkerValidators;
-import common.requests.*;
+import common.net.requests.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -18,7 +18,6 @@ import java.util.NoSuchElementException;
  * @see UserCommand
  */
 public class RemoveByIdCommand extends UserCommand {
-    private UDPClient client;
     /**
      * id of element to remove
      */
@@ -27,11 +26,9 @@ public class RemoveByIdCommand extends UserCommand {
     /**
      * RemoveByIdCommand constructor
      * <p> Firstly it initializes super constructor by command name, arguments and description
-     * @param collectionController
      */
-    public RemoveByIdCommand(UDPClient client) {
+    public RemoveByIdCommand() {
         super("remove_by_id", "id", "remove element with given id from collection");
-        this.client = client;
     }
 
     /**
@@ -45,9 +42,9 @@ public class RemoveByIdCommand extends UserCommand {
         try {
             ArrayList<Serializable> arguments = new ArrayList<>();
             arguments.add(id);
-            this.client.sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND,
+            UDPClient.getInstance().sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND,
                     new PackedCommand(super.getName(), arguments)));
-            return (ExecuteCommandResponce) this.client.receiveObject();
+            return (ExecuteCommandResponce) UDPClient.getInstance().receiveObject();
         }
         catch (Exception e) {
             return new ExecuteCommandResponce(ResultState.EXCEPTION, e);

@@ -2,8 +2,8 @@ package client.Commands;
 
 import client.UDPClient;
 import common.Exceptions.WrongAmountOfArgumentsException;
-import common.UserCommand;
-import common.requests.*;
+import common.Commands.UserCommand;
+import common.net.requests.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -14,14 +14,12 @@ import java.util.ArrayList;
  * @see UserCommand
  */
 public class InfoCommand extends UserCommand {
-    private UDPClient client;
     /**
      * InfoCommand constructor
      * <p> Firstly it initializes super constructor by command name, arguments and description
      */
-    public InfoCommand(UDPClient client) {
+    public InfoCommand() {
         super("info", "print information about collection");
-        this.client = client;
     }
 
     /**
@@ -31,8 +29,8 @@ public class InfoCommand extends UserCommand {
     @Override
     public ExecuteCommandResponce execute() {
         try {
-            this.client.sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new PackedCommand(super.getName(), new ArrayList<>())));
-            return (ExecuteCommandResponce) this.client.receiveObject();
+            UDPClient.getInstance().sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new PackedCommand(super.getName(), new ArrayList<>())));
+            return (ExecuteCommandResponce) UDPClient.getInstance().receiveObject();
         }
         catch (Exception e) {
             return new ExecuteCommandResponce(ResultState.EXCEPTION, e);

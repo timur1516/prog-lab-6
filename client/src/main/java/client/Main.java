@@ -7,13 +7,14 @@ import java.util.*;
 
 import client.Commands.*;
 import common.Commands.HelpCommand;
+import common.Constants;
 import common.Controllers.CommandsController;
 import client.Readers.WorkerReader;
 import common.UI.CommandReader;
 import common.UI.Console;
-import common.UserCommand;
-import common.requests.ExecuteCommandResponce;
-import common.requests.PackedCommand;
+import common.Commands.UserCommand;
+import common.net.requests.ExecuteCommandResponce;
+import common.net.requests.PackedCommand;
 
 /**
  * Main app class
@@ -21,13 +22,12 @@ import common.requests.PackedCommand;
  * <p>In the beginning loads data file (if it is wrong program stops), then calls interactiveMode method
  */
 public class Main {
+    private static final int TIMEOUT = 1000;
     private static WorkerReader workerReader;
     /**
      * Controller of commands
      */
     private static CommandsController commandsController;
-
-    private static UDPClient client;
     /**
      * Main method of program
      * <p>Calls methods to load data file, init all controllers and start handling user commands
@@ -38,8 +38,8 @@ public class Main {
         workerReader = new WorkerReader();
 
         try {
-            client = new UDPClient(InetAddress.getLocalHost(), 8081);
-            client.open();
+            UDPClient.getInstance().init(InetAddress.getLocalHost(), Constants.serverPort, TIMEOUT);
+            UDPClient.getInstance().open();
         } catch (UnknownHostException e) {
             Console.getInstance().printError("Server host was not found!");
             System.exit(0);
@@ -52,20 +52,20 @@ public class Main {
         commandsController.setCommandsList(
                 new ArrayList<>(Arrays.asList(
                         new HelpCommand(commandsController),
-                        new InfoCommand(client),
-                        new ShowCommand(client),
-                        new AddCommand(workerReader, client),
-                        new UpdateByIdCommand(workerReader, client),
-                        new RemoveByIdCommand(client),
-                        new ClearCommand(client),
+                        new InfoCommand(),
+                        new ShowCommand(),
+                        new AddCommand(workerReader),
+                        new UpdateByIdCommand(workerReader),
+                        new RemoveByIdCommand(),
+                        new ClearCommand(),
                         new ExecuteScriptCommand(),
-                        new ExitCommand(client),
-                        new RemoveFirstCommand(client),
-                        new RemoveGreaterCommand(workerReader, client),
-                        new RemoveLowerCommand(workerReader, client),
-                        new MinBySalaryCommand(client),
-                        new FilterLessThanEndDateCommand(workerReader, client),
-                        new PrintFieldDescendingSalaryCommand(client)
+                        new ExitCommand(),
+                        new RemoveFirstCommand(),
+                        new RemoveGreaterCommand(workerReader),
+                        new RemoveLowerCommand(workerReader),
+                        new MinBySalaryCommand(),
+                        new FilterLessThanEndDateCommand(workerReader),
+                        new PrintFieldDescendingSalaryCommand()
                 ))
         );
         interactiveMode();

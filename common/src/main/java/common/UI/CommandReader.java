@@ -1,6 +1,6 @@
 package common.UI;
 
-import common.requests.PackedCommand;
+import common.net.requests.PackedCommand;
 
 import java.util.ArrayList;
 import java.util.Arrays;

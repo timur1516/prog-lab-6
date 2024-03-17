@@ -1,12 +1,20 @@
 package server;
 
 import common.Commands.HelpCommand;
+import common.Constants;
+import common.Exceptions.ReceivingDataException;
+import common.Exceptions.SendingDataException;
 import common.FileLoader;
 import common.UI.CommandReader;
-import common.requests.*;
+import common.net.requests.ClientRequest;
+import common.net.requests.ExecuteCommandResponce;
+import common.net.requests.PackedCommand;
+import common.net.requests.ResultState;
 import common.Collection.*;
-import common.UserCommand;
+import common.Commands.UserCommand;
 import common.UI.Console;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.Commands.*;
 import server.Controllers.CollectionController;
 import common.Controllers.CommandsController;
@@ -17,9 +25,18 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.*;
 
+/**
+ * Main class for server app
+ */
 public class Main {
+    public static final Logger logger = LoggerFactory.getLogger(Main.class);
+    /**
+     * Server object
+     */
     public static UDPServer server;
-
+    /**
+     * Selector object for handling many clients
+     */
     private static Selector selector;
     /**
      * Controller of collection
@@ -35,26 +52,30 @@ public class Main {
      * Controller of data file
      */
     private static DataFileController dataFileController;
-
+    /**
+     * Reader for checking if admin console input is ready
+     */
     private static Reader reader;
 
     /**
      * Main method of program
-     * <p>Calls methods to load data file, init all controllers and start handling user commands
+     * <p>Calls methods to load data file, init all controllers, run server and start handling client commands
      * @param args (not used)
      */
     public static void main(String[] args) {
+        logger.info("Logger for server started");
+
         reader = new InputStreamReader(System.in);
         Console.getInstance().setScanner(new Scanner(reader));
-
-        server = new UDPServer(8081);
+        logger.info("Console handler was initialized successfully");
+        server = new UDPServer(Constants.serverPort);
         try {
             server.open();
             selector = Selector.open();
             server.registerSelector(selector, SelectionKey.OP_READ);
+            logger.info("Server started successfully");
         } catch (IOException e) {
-            Console.getInstance().printError("Error while starting server!");
-            Console.getInstance().printError(e.getMessage());
+            logger.error("Error while starting server!", e);
             System.exit(0);
         }
 
@@ -89,9 +110,8 @@ public class Main {
     }
 
     /**
-     * Method to handle user input
-     *
-     * <p>Reads commands from user, gets their name and arguments, launch command and execute it
+     * Method to handle server requests
+     * <p>It checks two possible sourses of requests: admin console and client
      * <p>If any error is occurred method prints error message and continues to read data
      */
     public static void interactiveMode() {
@@ -100,29 +120,44 @@ public class Main {
                 askClient();
                 askAdmin();
             } catch (IOException e) {
-                Console.getInstance().printError("An error occurred while reading reading request!");
-                Console.getInstance().printError(e.getMessage());
-            } catch (ClassNotFoundException e) {
-                Console.getInstance().printError("Unknown class received from client!");
-                Console.getInstance().printError(e.getMessage());
+                logger.error("An error occurred while reading request!", e);
             }
         }
     }
 
-    private static void askClient() throws IOException, ClassNotFoundException {
+    /**
+     * Method to handle requests from all clients
+     * <p>It gets list of all available clients and then call {@link #handleClientRequest(ClientRequest)} method
+     * @throws IOException If any I\O error occurred
+     * @throws ReceivingDataException If error occurred while receiving data from client
+     */
+    private static void askClient() throws IOException {
         if(selector.selectNow() == 0) return;
         Set<SelectionKey> keys = selector.selectedKeys();
         for (var iter = keys.iterator(); iter.hasNext();){
             SelectionKey key = iter.next(); iter.remove();
             if(key.isValid()){
                 if(key.isReadable()){
-                    ClientRequest clientRequest = (ClientRequest) server.receiveObject();
-                    handleClientRequest(clientRequest);
+                    ClientRequest clientRequest;
+                    try {
+                        clientRequest = (ClientRequest) server.receiveObject();
+                        handleClientRequest(clientRequest);
+                    } catch (SendingDataException e) {
+                        logger.error("Could not send data to client", e);
+                    } catch (ReceivingDataException e) {
+                        logger.error("Could not receive data from client", e);
+                    }
                 }
             }
         }
     }
 
+    /**
+     * Method to check if any commands from admin were received
+     * <p>If console input is ready, command is read using {@link CommandReader}
+     * <p>Then {@link #handleAdminRequest(PackedCommand)} method is called
+     * @throws IOException
+     */
     private static void askAdmin() throws IOException {
         if(reader.ready()) {
             PackedCommand packedCommand = CommandReader.getInstance().readCommand();
@@ -130,6 +165,11 @@ public class Main {
         }
     }
 
+    /**
+     * Method to handle commands from admin
+     * <p>It creates {@link UserCommand} object, executes it and print result to console
+     * @param packedCommand Object which contains all info about command
+     */
     private static void handleAdminRequest(PackedCommand packedCommand) {
         UserCommand command;
         try {
@@ -148,10 +188,17 @@ public class Main {
         }
     }
 
-    private static void handleClientRequest(ClientRequest clientRequest) throws IOException {
+    /**
+     * Method to handle requests from client
+     * <p>It check what type of requests is received and then generate and rend answer to client
+     * @param clientRequest Request from client
+     * @throws IOException If any I\O error occurred while sending answer to client
+     */
+    private static void handleClientRequest(ClientRequest clientRequest) throws SendingDataException {
         switch (clientRequest.type()) {
             case EXECUTE_COMMAND:
                 PackedCommand packedCommand = (PackedCommand) clientRequest.data();
+                logger.info("Request for executing command {}", packedCommand.commandName());
                 ExecuteCommandResponce executeCommandResponce = null;
                 try {
                     UserCommand command = clientCommandsController.launchCommand(packedCommand);
@@ -160,25 +207,34 @@ public class Main {
                     executeCommandResponce = new ExecuteCommandResponce(ResultState.EXCEPTION, e);
                 } finally {
                     server.sendObject(executeCommandResponce);
+                    logger.info("Command {} executed successfully", packedCommand.commandName());
                 }
                 break;
             case CHECK_ID:
                 long id = (long) clientRequest.data();
+                logger.info("Request for checking id {}",id);
                 server.sendObject(collectionController.containsId(id));
+                logger.info("Request handled successfully");
                 break;
             case IS_COLLECTION_EMPTY:
+                logger.info("Request for checking if collection is empty");
                 server.sendObject(collectionController.getCollection().isEmpty());
+                logger.info("Request handled successfully");
                 break;
         }
     }
 
-
+    /**
+     * Method to read name of environmental variable from console
+     * <p>If variable if is not valid it prints an error message and stops program
+     * @return String path to data file
+     */
     private static String readFileName(){
         Console.getInstance().print("Enter environmental variable name: ");
         String envName = Console.getInstance().readLine().trim();
         String dataFilePath = System.getenv(envName);
         if(dataFilePath == null){
-            Console.getInstance().printError("Environmental variable is not defined!");
+            logger.error("Environmental variable is not defined!");
             System.exit(0);
         }
         return dataFilePath;
@@ -209,15 +265,15 @@ public class Main {
         try {
             data = dataFileController.readJSON();
         } catch (Exception e) {
-            Console.getInstance().printError("Data file reading error!");
+            logger.error("Data file reading error!", e);
             System.exit(0);
         }
         if(data == null) data = new PriorityQueue<>();
         if(!CollectionController.isValid(data)){
-            Console.getInstance().printError("Data file is not valid!");
+            logger.error("Data file is not valid!");
             System.exit(0);
         }
-        Console.getInstance().printLn("Data loaded successfully!");
+        logger.info("Data was loaded successfully!");
         return data;
     }
 }

@@ -38,4 +38,9 @@ public class Constants {
      * <p>It is used to track recursion of scripts
      */
     public static Stack<String> scriptStack = new Stack<>();
+
+    /**
+     * Server info
+     */
+    public static final int serverPort = 8081;
 }

@@ -7,9 +7,9 @@ import common.Constants;
 import common.Exceptions.InvalidDataException;
 import common.Exceptions.WrongAmountOfArgumentsException;
 import common.Parsers.WorkerParsers;
-import common.UserCommand;
+import common.Commands.UserCommand;
 import common.Validators.WorkerValidators;
-import common.requests.*;
+import common.net.requests.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -25,8 +25,6 @@ public class UpdateByIdCommand extends UserCommand {
      * Worker reader which is used to read new element from user
      */
     private WorkerReader workerReader;
-
-    UDPClient client;
     /**
      * id of element to update
      */
@@ -37,10 +35,9 @@ public class UpdateByIdCommand extends UserCommand {
      * <p> Firstly it initializes super constructor by command name, arguments and description
      * @param workerReader
      */
-    public UpdateByIdCommand(WorkerReader workerReader, UDPClient client) {
+    public UpdateByIdCommand(WorkerReader workerReader) {
         super("update", "id {element}", "update value of collection element which id is equal to given");
         this.workerReader = workerReader;
-        this.client = client;
     }
 
     /**
@@ -52,8 +49,8 @@ public class UpdateByIdCommand extends UserCommand {
     @Override
     public ExecuteCommandResponce execute() {
         try {
-            client.sendObject(new ClientRequest(ClientRequestType.CHECK_ID, id));
-            if (!(boolean)(client.receiveObject())) {
+            UDPClient.getInstance().sendObject(new ClientRequest(ClientRequestType.CHECK_ID, id));
+            if (!(boolean)(UDPClient.getInstance().receiveObject())) {
                 if (Constants.SCRIPT_MODE) {
                     workerReader.readWorker();
                 }
@@ -64,8 +61,8 @@ public class UpdateByIdCommand extends UserCommand {
             ArrayList<Serializable> arguments = new ArrayList<>();
             arguments.add(id);
             arguments.add(worker);
-            client.sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new PackedCommand(super.getName(), arguments)));
-            return (ExecuteCommandResponce) client.receiveObject();
+            UDPClient.getInstance().sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new PackedCommand(super.getName(), arguments)));
+            return (ExecuteCommandResponce) UDPClient.getInstance().receiveObject();
         } catch (Exception e){
             return new ExecuteCommandResponce(ResultState.EXCEPTION, e);
         }

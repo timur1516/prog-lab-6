@@ -3,10 +3,9 @@ package client.Commands;
 import client.Readers.WorkerReader;
 import client.UDPClient;
 import common.Collection.Worker;
-import common.Exceptions.InvalidDataException;
 import common.Exceptions.WrongAmountOfArgumentsException;
-import common.UserCommand;
-import common.requests.*;
+import common.Commands.UserCommand;
+import common.net.requests.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,24 +21,20 @@ public class AddCommand extends UserCommand {
      */
     private WorkerReader workerReader;
 
-    private UDPClient client;
-
     /**
      * AddCommand constructor
      * <p> Firstly it initializes super constructor by command name, arguments and description
      * @param workerReader
      */
-    public AddCommand(WorkerReader workerReader, UDPClient client) {
+    public AddCommand(WorkerReader workerReader) {
         super("add", "{element}", "add new element to collection");
         this.workerReader = workerReader;
-        this.client = client;
     }
 
     /**
      * Method to complete add command
      * <p>It reads new element and then adds it to collection
-     *
-     * @throws InvalidDataException If an error occurred while reading
+     * @return
      */
     @Override
     public ExecuteCommandResponce execute() {
@@ -47,8 +42,8 @@ public class AddCommand extends UserCommand {
             Worker worker = this.workerReader.readWorker();
             ArrayList<Serializable> arguments = new ArrayList<>();
             arguments.add(worker);
-            this.client.sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new PackedCommand(super.getName(), arguments)));
-            return (ExecuteCommandResponce) this.client.receiveObject();
+            UDPClient.getInstance().sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new PackedCommand(super.getName(), arguments)));
+            return (ExecuteCommandResponce) UDPClient.getInstance().receiveObject();
         }
         catch (Exception e) {
             return new ExecuteCommandResponce(ResultState.EXCEPTION, e);

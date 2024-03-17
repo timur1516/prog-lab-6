@@ -3,12 +3,14 @@ package server.Commands;
 import common.Exceptions.ExitingException;
 import common.Exceptions.WrongAmountOfArgumentsException;
 import common.UI.YesNoQuestionAsker;
-import common.UserCommand;
-import common.requests.ExecuteCommandResponce;
-import common.requests.PackedCommand;
-import common.requests.ResultState;
+import common.Commands.UserCommand;
+import common.net.requests.ExecuteCommandResponce;
+import common.net.requests.PackedCommand;
+import common.net.requests.ResultState;
 import common.Controllers.CommandsController;
+import server.Main;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -46,6 +48,11 @@ public class ExitCommand extends UserCommand {
                 String message = "Collection wasn't saved!\n" +
                         e.getMessage() + "\n Exit canceled!";
                 return new ExecuteCommandResponce(ResultState.EXCEPTION, new ExitingException(message));
+            }
+            try {
+                Main.server.stop();
+            } catch (IOException e) {
+                return new ExecuteCommandResponce(ResultState.EXCEPTION, new ExitingException("Could not stop server!"));
             }
             System.exit(0);
         }

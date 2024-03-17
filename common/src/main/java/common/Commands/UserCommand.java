@@ -1,4 +1,4 @@
-package common;
+package common.Commands;
 
 import java.io.Serializable;
 import java.util.ArrayList;

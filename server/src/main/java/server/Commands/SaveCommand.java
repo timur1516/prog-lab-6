@@ -1,9 +1,9 @@
 package server.Commands;
 
 import common.Exceptions.WrongAmountOfArgumentsException;
-import common.UserCommand;
-import common.requests.ExecuteCommandResponce;
-import common.requests.ResultState;
+import common.Commands.UserCommand;
+import common.net.requests.ExecuteCommandResponce;
+import common.net.requests.ResultState;
 import server.Controllers.CollectionController;
 import server.Controllers.DataFileController;
 

@@ -1,10 +1,10 @@
 package client.Commands;
 
-import client.UDPClient;
 import common.UI.YesNoQuestionAsker;
 import common.Exceptions.WrongAmountOfArgumentsException;
-import common.UserCommand;
-import common.requests.*;
+import common.Commands.UserCommand;
+import common.net.requests.ExecuteCommandResponce;
+import common.net.requests.ResultState;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -15,14 +15,12 @@ import java.util.ArrayList;
  * @see UserCommand
  */
 public class ExitCommand extends UserCommand {
-    private UDPClient client;
     /**
      * ExitCommand constructor
      * <p> Firstly it initializes super constructor by command name, arguments and description
      */
-    public ExitCommand(UDPClient client) {
+    public ExitCommand() {
         super("exit", "stop program without saving collection");
-        this.client = client;
     }
 
     /**

@@ -5,14 +5,14 @@ import common.Constants;
 import common.Exceptions.RecursiveScriptException;
 import common.Exceptions.WrongAmountOfArgumentsException;
 import common.FileLoader;
-import common.UserCommand;
-import common.requests.ExecuteCommandResponce;
+import common.Commands.UserCommand;
+import common.net.requests.ExecuteCommandResponce;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 import common.UI.Console;
-import common.requests.ResultState;
+import common.net.requests.ResultState;
 
 /**
  * Class with realization of execute_script command
