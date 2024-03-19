@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 /**
- * Class with realization of filter_less_than_end_date command
+ * Class with realization of filter_less_than_end_date command for client
  * <p>This command is used to print all elements whose endDate is less than given
  * @see UserCommand
  */
@@ -28,7 +28,7 @@ public class FilterLessThanEndDateCommand extends UserCommand {
      * @param workerReader
      */
     public FilterLessThanEndDateCommand(WorkerReader workerReader) {
-        super("filter_less_than_end_date", "endDate", "print all elements whose endDate is less than given");
+        super("filter_less_than_end_date", "print all elements whose endDate is less than given","endDate");
         this.workerReader = workerReader;
     }
 
@@ -39,33 +39,25 @@ public class FilterLessThanEndDateCommand extends UserCommand {
      *
      */
     @Override
-    public ExecuteCommandResponce execute() {
+    public ExecuteCommandResponse execute() {
         try {
             UDPClient.getInstance().sendObject(new ClientRequest(ClientRequestType.IS_COLLECTION_EMPTY, null));
             if (((boolean)UDPClient.getInstance().receiveObject())) {
                 if (Constants.SCRIPT_MODE) {
                     workerReader.readEndDate();
                 }
-                return new ExecuteCommandResponce(ResultState.SUCCESS, "Collection is empty!");
+                return new ExecuteCommandResponse(ResultState.SUCCESS, "Collection is empty!");
             }
+
             LocalDateTime endDate = workerReader.readEndDate();
             ArrayList<Serializable> arguments = new ArrayList<>();
             arguments.add(endDate);
-            UDPClient.getInstance().sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new PackedCommand(super.getName(), arguments)));
-            return (ExecuteCommandResponce) UDPClient.getInstance().receiveObject();
-        } catch (Exception e){
-            return new ExecuteCommandResponce(ResultState.EXCEPTION, e);
-        }
-    }
 
-    /**
-     * Method checks if amount arguments is correct
-     *
-     * @param arguments String array with different arguments
-     * @throws WrongAmountOfArgumentsException If number of arguments is not equal to zero
-     */
-    @Override
-    public void initCommandArgs(ArrayList<Serializable> arguments) throws WrongAmountOfArgumentsException {
-        if(!arguments.isEmpty()) throw new WrongAmountOfArgumentsException("Wrong amount of arguments!", 0, arguments.size());
+            UDPClient.getInstance().sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new PackedCommand(super.getName(), arguments)));
+
+            return (ExecuteCommandResponse) UDPClient.getInstance().receiveObject();
+        } catch (Exception e){
+            return new ExecuteCommandResponse(ResultState.EXCEPTION, e);
+        }
     }
 }

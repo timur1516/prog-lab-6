@@ -3,7 +3,8 @@ package server.Commands;
 import common.Collection.Worker;
 import common.Commands.ICommand;
 import common.Commands.UserCommand;
-import common.net.requests.ExecuteCommandResponce;
+import common.Exceptions.InvalidDataException;
+import common.net.requests.ExecuteCommandResponse;
 import common.net.requests.ResultState;
 import server.Controllers.CollectionController;
 
@@ -32,7 +33,7 @@ public class AddCommand extends UserCommand {
      * @param collectionController
      */
     public AddCommand(CollectionController collectionController) {
-        super("add", "{element}", "add new element to collection");
+        super("add", "add new element to collection", "{element}");
         this.collectionController = collectionController;
     }
 
@@ -48,8 +49,8 @@ public class AddCommand extends UserCommand {
      * @return
      */
     @Override
-    public ExecuteCommandResponce execute() {
+    public ExecuteCommandResponse execute() {
         collectionController.add(worker);
-        return new ExecuteCommandResponce(ResultState.SUCCESS, "Worker added successfully!");
+        return new ExecuteCommandResponse(ResultState.SUCCESS, "Worker added successfully!");
     }
 }

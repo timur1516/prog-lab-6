@@ -4,7 +4,7 @@ import common.Exceptions.InvalidDataException;
 import common.Exceptions.WrongAmountOfArgumentsException;
 import common.Commands.ICommand;
 import common.Commands.UserCommand;
-import common.net.requests.ExecuteCommandResponce;
+import common.net.requests.ExecuteCommandResponse;
 import common.net.requests.ResultState;
 import server.Controllers.CollectionController;
 
@@ -31,7 +31,7 @@ public class FilterLessThanEndDateCommand extends UserCommand {
      * @param collectionController
      */
     public FilterLessThanEndDateCommand(CollectionController collectionController) {
-        super("filter_less_than_end_date", "endDate", "print all elements whose endDate is less than given");
+        super("filter_less_than_end_date", "print all elements whose endDate is less than given", "endDate");
         this.collectionController = collectionController;
     }
 
@@ -43,16 +43,16 @@ public class FilterLessThanEndDateCommand extends UserCommand {
      * @return
      */
     @Override
-    public ExecuteCommandResponce execute() {
+    public ExecuteCommandResponse execute() {
         if(this.collectionController.getCollection().isEmpty()){
-            return new ExecuteCommandResponce(ResultState.SUCCESS, "Collection is empty!");
+            return new ExecuteCommandResponse(ResultState.SUCCESS, "Collection is empty!");
         }
-        return new ExecuteCommandResponce(ResultState.SUCCESS,
+        return new ExecuteCommandResponse(ResultState.SUCCESS,
                 this.collectionController.getLessThanEndDate(endDate).toString());
     }
 
     @Override
-    public void initCommandArgs(ArrayList<Serializable> arguments) throws InvalidDataException, WrongAmountOfArgumentsException {
+    public void initCommandArgs(ArrayList<Serializable> arguments) {
         this.endDate = (LocalDateTime) arguments.get(0);
     }
 }

@@ -3,7 +3,6 @@ package client.Commands;
 import client.Readers.WorkerReader;
 import client.UDPClient;
 import common.Collection.Worker;
-import common.Exceptions.WrongAmountOfArgumentsException;
 import common.Commands.UserCommand;
 import common.net.requests.*;
 
@@ -11,8 +10,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
- * Class with realization of add command
- * <p>This command is used to add new element to collection
+ * Class with realization of add command on client app
+ * <p>This command is used to read data from user and send request to server
  * @see UserCommand
  */
 public class AddCommand extends UserCommand {
@@ -27,37 +26,26 @@ public class AddCommand extends UserCommand {
      * @param workerReader
      */
     public AddCommand(WorkerReader workerReader) {
-        super("add", "{element}", "add new element to collection");
+        super("add", "add new element to collection", "{element}");
         this.workerReader = workerReader;
     }
 
     /**
      * Method to complete add command
-     * <p>It reads new element and then adds it to collection
+     * <p>It reads new element and then send request for adding to server
      * @return
      */
     @Override
-    public ExecuteCommandResponce execute() {
+    public ExecuteCommandResponse execute() {
         try {
             Worker worker = this.workerReader.readWorker();
             ArrayList<Serializable> arguments = new ArrayList<>();
             arguments.add(worker);
             UDPClient.getInstance().sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new PackedCommand(super.getName(), arguments)));
-            return (ExecuteCommandResponce) UDPClient.getInstance().receiveObject();
+            return (ExecuteCommandResponse) UDPClient.getInstance().receiveObject();
         }
         catch (Exception e) {
-            return new ExecuteCommandResponce(ResultState.EXCEPTION, e);
+            return new ExecuteCommandResponse(ResultState.EXCEPTION, e);
         }
-    }
-
-    /**
-     * Method checks if amount arguments is correct
-     *
-     * @param arguments String array with different arguments
-     * @throws WrongAmountOfArgumentsException If number of arguments is not equal to zero
-     */
-    @Override
-    public void initCommandArgs(ArrayList<Serializable> arguments) throws WrongAmountOfArgumentsException {
-        if(!arguments.isEmpty()) throw new WrongAmountOfArgumentsException("Wrong amount of arguments!", 0, arguments.size());
     }
 }

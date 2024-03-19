@@ -2,7 +2,7 @@ package client.Readers;
 
 import java.time.LocalDateTime;
 
-import common.Parsers.WorkerParsers;
+import client.Parsers.WorkerParsers;
 import common.UI.Console;
 import common.UI.YesNoQuestionAsker;
 import common.Collection.*;

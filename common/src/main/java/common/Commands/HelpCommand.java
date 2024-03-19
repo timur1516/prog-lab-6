@@ -2,7 +2,7 @@ package common.Commands;
 
 import common.Controllers.CommandsController;
 import common.Exceptions.WrongAmountOfArgumentsException;
-import common.net.requests.ExecuteCommandResponce;
+import common.net.requests.ExecuteCommandResponse;
 import common.net.requests.ResultState;
 
 import java.io.Serializable;
@@ -34,22 +34,11 @@ public class HelpCommand extends UserCommand {
      * <p>It gets all commands from commandController and then prints their description
      */
     @Override
-    public ExecuteCommandResponce execute() {
+    public ExecuteCommandResponse execute() {
         String result = "";
         for(UserCommand command : this.commandsController.getCommandsList()){
             result += command.toString() + "\n";
         }
-        return new ExecuteCommandResponce(ResultState.SUCCESS, result);
-    }
-
-    /**
-     * Method checks if amount arguments is correct
-     *
-     * @param arguments String array with different arguments
-     * @throws WrongAmountOfArgumentsException If number of arguments is not equal to zero
-     */
-    @Override
-    public void initCommandArgs(ArrayList<Serializable> arguments) throws WrongAmountOfArgumentsException {
-        if(!arguments.isEmpty()) throw new WrongAmountOfArgumentsException("Wrong amount of arguments!", 0, arguments.size());
+        return new ExecuteCommandResponse(ResultState.SUCCESS, result);
     }
 }

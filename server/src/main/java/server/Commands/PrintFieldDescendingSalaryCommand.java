@@ -2,7 +2,7 @@ package server.Commands;
 
 import common.Commands.ICommand;
 import common.Commands.UserCommand;
-import common.net.requests.ExecuteCommandResponce;
+import common.net.requests.ExecuteCommandResponse;
 import common.net.requests.ResultState;
 import server.Controllers.CollectionController;
 
@@ -36,11 +36,11 @@ public class PrintFieldDescendingSalaryCommand extends UserCommand {
      * @return
      */
     @Override
-    public ExecuteCommandResponce execute() {
+    public ExecuteCommandResponse execute() {
         if(this.collectionController.getCollection().isEmpty()){
-            return new ExecuteCommandResponce(ResultState.SUCCESS,"Collection is empty!");
+            return new ExecuteCommandResponse(ResultState.SUCCESS,"Collection is empty!");
         }
-        return new ExecuteCommandResponce(ResultState.SUCCESS,
+        return new ExecuteCommandResponse(ResultState.SUCCESS,
                 this.collectionController.getDescendingSalaries().toString());
     }
 }

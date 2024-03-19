@@ -1,6 +1,6 @@
 package common.Commands;
 
-import common.net.requests.ExecuteCommandResponce;
+import common.net.requests.ExecuteCommandResponse;
 
 /**
  * Interface of all commands
@@ -17,5 +17,5 @@ public interface ICommand {
      *
      * @return
      */
-    ExecuteCommandResponce execute();
+    ExecuteCommandResponse execute();
 }

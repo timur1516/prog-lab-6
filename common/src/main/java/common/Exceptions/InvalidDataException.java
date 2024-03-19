@@ -1,7 +1,5 @@
 package common.Exceptions;
 
-import java.io.IOException;
-
 /**
  * Signals that some data is not valid
  */

@@ -2,7 +2,8 @@ package server.Commands;
 
 import common.Commands.ICommand;
 import common.Commands.UserCommand;
-import common.net.requests.ExecuteCommandResponce;
+import common.Exceptions.InvalidDataException;
+import common.net.requests.ExecuteCommandResponse;
 import common.net.requests.ResultState;
 import server.Controllers.CollectionController;
 
@@ -33,7 +34,7 @@ public class RemoveByIdCommand extends UserCommand {
      * @param collectionController
      */
     public RemoveByIdCommand(CollectionController collectionController) {
-        super("remove_by_id", "id", "remove element with given id from collection");
+        super("remove_by_id", "remove element with given id from collection", "id");
         this.collectionController = collectionController;
         this.id = id;
     }
@@ -46,17 +47,18 @@ public class RemoveByIdCommand extends UserCommand {
      * @throws NoSuchElementException is element with given id was not found
      */
     @Override
-    public ExecuteCommandResponce execute() {
+    public ExecuteCommandResponse execute() {
         if(!collectionController.containsId(id)){
-            return new ExecuteCommandResponce(ResultState.EXCEPTION,
+            return new ExecuteCommandResponse(ResultState.EXCEPTION,
                     new NoSuchElementException("No element with such id!"));
         }
         this.collectionController.removeById(id);
-        return new ExecuteCommandResponce(ResultState.SUCCESS, "Element removed successfully!");
+        return new ExecuteCommandResponse(ResultState.SUCCESS, "Element removed successfully!");
     }
 
     @Override
-    public void initCommandArgs(ArrayList<Serializable> arguments) {
+    public void initCommandArgs(ArrayList<Serializable> arguments) throws InvalidDataException {
+        super.initCommandArgs(arguments);
         this.id = (long) arguments.get(0);
     }
 }

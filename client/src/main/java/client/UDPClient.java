@@ -5,11 +5,26 @@ import common.net.NetDataTransferringHandler;
 import java.io.*;
 import java.net.*;
 
+/**
+ * Singleton class for UPD client
+ */
 public class UDPClient extends NetDataTransferringHandler {
     private static UDPClient UDP_CLIENT = null;
+    /**
+     * Datagram socket for client
+     */
     DatagramSocket ds;
+    /**
+     * Servers host
+     */
     InetAddress host;
+    /**
+     * Servers port
+     */
     int port;
+    /**
+     * Timeout for waiting for server response
+     */
     int timeout;
 
     private UDPClient(){};
@@ -20,18 +35,31 @@ public class UDPClient extends NetDataTransferringHandler {
         return UDP_CLIENT;
     }
 
+    /**
+     * Method to init client
+     * @param host
+     * @param port
+     * @param timeout
+     */
     public void init(InetAddress host, int port, int timeout) {
         this.host = host;
         this.port = port;
         this.timeout = timeout;
     }
 
+    /**
+     * Method to start UDP client
+     * @throws SocketException If any error occurred
+     */
     @Override
     public void open() throws SocketException {
         this.ds = new DatagramSocket();
         this.ds.setSoTimeout(this.timeout);
     }
 
+    /**
+     * Method to stop UPD client
+     */
     @Override
     public void stop() {
         this.ds.close();

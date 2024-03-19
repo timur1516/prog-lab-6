@@ -4,7 +4,7 @@ import common.Collection.Worker;
 import common.Exceptions.InvalidDataException;
 import common.Commands.ICommand;
 import common.Commands.UserCommand;
-import common.net.requests.ExecuteCommandResponce;
+import common.net.requests.ExecuteCommandResponse;
 import common.net.requests.ResultState;
 import server.Controllers.CollectionController;
 
@@ -30,7 +30,7 @@ public class RemoveGreaterCommand extends UserCommand {
      * @param collectionController
      */
     public RemoveGreaterCommand(CollectionController collectionController) {
-        super("remove_greater", "{element}", "remove all elements which are greater than given");
+        super("remove_greater", "remove all elements which are greater than given", "{element}");
         this.collectionController = collectionController;
     }
 
@@ -41,15 +41,14 @@ public class RemoveGreaterCommand extends UserCommand {
      * <p>If collection is empty element is not read (except script mode)
      *
      * @return
-     * @throws InvalidDataException If an error occurred while reading
      */
     @Override
-    public ExecuteCommandResponce execute() {
+    public ExecuteCommandResponse execute() {
         if(this.collectionController.getCollection().isEmpty()){
-            return new ExecuteCommandResponce(ResultState.SUCCESS, "Collection is empty!");
+            return new ExecuteCommandResponse(ResultState.SUCCESS, "Collection is empty!");
         }
         int elementsRemoved = this.collectionController.removeGreater(worker);
-        return new ExecuteCommandResponce(ResultState.SUCCESS,
+        return new ExecuteCommandResponse(ResultState.SUCCESS,
                 String.format("Successfully removed %d elements!", elementsRemoved));
     }
 

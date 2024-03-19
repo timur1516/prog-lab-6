@@ -1,0 +1,144 @@
+@startuml
+class client.Commands.ShowCommand {
++ <<Create>> ShowCommand()
++ ExecuteCommandResponse execute()
+}
+class client.Commands.ClearCommand {
++ <<Create>> ClearCommand()
++ ExecuteCommandResponse execute()
+}
+class client.Commands.PrintFieldDescendingSalaryCommand {
++ <<Create>> PrintFieldDescendingSalaryCommand()
++ ExecuteCommandResponse execute()
+}
+class client.UDPClient {
+- {static} UDPClient UDP_CLIENT
+~ DatagramSocket ds
+~ InetAddress host
+~ int port
+~ int timeout
+- <<Create>> UDPClient()
++ {static} UDPClient getInstance()
++ void init(InetAddress,int,int)
++ void open()
++ void stop()
+# byte[] receive(int)
+# void send(byte[])
+}
+class client.Parsers.WorkerParsers {
++ {static} Parser<String> stringParser
++ {static} Parser<Long> longParser
++ {static} Parser<Integer> integerParser
++ {static} Parser<Double> doubleParser
++ {static} Parser<LocalDateTime> localDateTimeParser
++ {static} Parser<Status> statusParser
++ {static} Parser<Color> eyeColorParser
++ {static} Parser<Country> nationalityParser
+}
+class client.Commands.RemoveByIdCommand {
+- long id
++ <<Create>> RemoveByIdCommand()
++ ExecuteCommandResponse execute()
++ void initCommandArgs(ArrayList<Serializable>)
+}
+class client.Commands.ExecuteScriptCommand {
+- String scriptFilePath
++ <<Create>> ExecuteScriptCommand()
++ ExecuteCommandResponse execute()
++ void initCommandArgs(ArrayList<Serializable>)
+}
+class client.Exceptions.RecursiveScriptException {
++ <<Create>> RecursiveScriptException(String)
+}
+class client.Commands.RemoveGreaterCommand {
+- WorkerReader workerReader
++ <<Create>> RemoveGreaterCommand(WorkerReader)
++ ExecuteCommandResponse execute()
+}
+interface client.Parsers.Parser {
+~ T parse(String)
+}
+class client.Commands.UpdateByIdCommand {
+- WorkerReader workerReader
+- long id
++ <<Create>> UpdateByIdCommand(WorkerReader)
++ ExecuteCommandResponse execute()
++ void initCommandArgs(ArrayList<Serializable>)
+}
+class client.Commands.RemoveLowerCommand {
+- WorkerReader workerReader
++ <<Create>> RemoveLowerCommand(WorkerReader)
++ ExecuteCommandResponse execute()
+}
+class client.Commands.FilterLessThanEndDateCommand {
+- WorkerReader workerReader
++ <<Create>> FilterLessThanEndDateCommand(WorkerReader)
++ ExecuteCommandResponse execute()
+}
+class client.Main {
+- {static} int TIMEOUT
+- {static} WorkerReader workerReader
+- {static} CommandsController commandsController
++ {static} void main(String[])
++ {static} void scriptMode()
++ {static} void interactiveMode()
+}
+class client.Commands.RemoveFirstCommand {
++ <<Create>> RemoveFirstCommand()
++ ExecuteCommandResponse execute()
+}
+class client.Commands.AddCommand {
+- WorkerReader workerReader
++ <<Create>> AddCommand(WorkerReader)
++ ExecuteCommandResponse execute()
+}
+class client.Commands.InfoCommand {
++ <<Create>> InfoCommand()
++ ExecuteCommandResponse execute()
+}
+class client.Commands.MinBySalaryCommand {
++ <<Create>> MinBySalaryCommand()
++ ExecuteCommandResponse execute()
+}
+abstract class client.Readers.ValueReader {
++ T readValue(String,Validator<T>,Parser<T>)
+}
+class client.Readers.WorkerReader {
++ Worker readWorker()
++ String readName()
++ Coordinates readCoordinates()
++ double readX()
++ double readY()
++ Integer readSalary()
++ LocalDateTime readStartDate()
++ LocalDateTime readEndDate()
++ Status readStatus()
++ Person readPerson()
++ long readHeight()
++ Color readEyeColor()
++ Country readNationality()
+}
+class client.Commands.ExitCommand {
++ <<Create>> ExitCommand()
++ ExecuteCommandResponse execute()
+}
+
+
+common.Commands.UserCommand <|-- client.Commands.ShowCommand
+common.Commands.UserCommand <|-- client.Commands.ClearCommand
+common.Commands.UserCommand <|-- client.Commands.PrintFieldDescendingSalaryCommand
+common.net.NetDataTransferringHandler <|-- client.UDPClient
+common.Commands.UserCommand <|-- client.Commands.RemoveByIdCommand
+common.Commands.UserCommand <|-- client.Commands.ExecuteScriptCommand
+client.Exceptions.Exception <|-- client.Exceptions.RecursiveScriptException
+common.Commands.UserCommand <|-- client.Commands.RemoveGreaterCommand
+common.Commands.UserCommand <|-- client.Commands.UpdateByIdCommand
+common.Commands.UserCommand <|-- client.Commands.RemoveLowerCommand
+common.Commands.UserCommand <|-- client.Commands.FilterLessThanEndDateCommand
+common.Commands.UserCommand <|-- client.Commands.RemoveFirstCommand
+common.Commands.UserCommand <|-- client.Commands.AddCommand
+common.Commands.UserCommand <|-- client.Commands.InfoCommand
+common.Commands.UserCommand <|-- client.Commands.MinBySalaryCommand
+client.Readers.ValueReader <|-- client.Readers.WorkerReader
+common.Commands.UserCommand <|-- client.Commands.ExitCommand
+@enduml

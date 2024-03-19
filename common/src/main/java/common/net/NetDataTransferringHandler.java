@@ -7,7 +7,7 @@ import java.io.*;
 
 /**
  * Abstract class to handle net data transferring
- * <p>It has methods fro serialization and deserialization of objects and methods to send and receive objects
+ * <p>It has methods for serialization and deserialization of objects and methods to send and receive objects
  */
 public abstract class NetDataTransferringHandler {
     /**

@@ -7,7 +7,7 @@ import common.Exceptions.SendingDataException;
 import common.FileLoader;
 import common.UI.CommandReader;
 import common.net.requests.ClientRequest;
-import common.net.requests.ExecuteCommandResponce;
+import common.net.requests.ExecuteCommandResponse;
 import common.net.requests.PackedCommand;
 import common.net.requests.ResultState;
 import common.Collection.*;
@@ -178,7 +178,7 @@ public class Main {
             Console.getInstance().printError(e.getMessage());
             return;
         }
-        ExecuteCommandResponce responce = command.execute();
+        ExecuteCommandResponse responce = command.execute();
         switch (responce.state()) {
             case SUCCESS:
                 Console.getInstance().printLn(responce.data());
@@ -199,14 +199,14 @@ public class Main {
             case EXECUTE_COMMAND:
                 PackedCommand packedCommand = (PackedCommand) clientRequest.data();
                 logger.info("Request for executing command {}", packedCommand.commandName());
-                ExecuteCommandResponce executeCommandResponce = null;
+                ExecuteCommandResponse executeCommandResponse = null;
                 try {
                     UserCommand command = clientCommandsController.launchCommand(packedCommand);
-                    executeCommandResponce = command.execute();
+                    executeCommandResponse = command.execute();
                 } catch (Exception e) {
-                    executeCommandResponce = new ExecuteCommandResponce(ResultState.EXCEPTION, e);
+                    executeCommandResponse = new ExecuteCommandResponse(ResultState.EXCEPTION, e);
                 } finally {
-                    server.sendObject(executeCommandResponce);
+                    server.sendObject(executeCommandResponse);
                     logger.info("Command {} executed successfully", packedCommand.commandName());
                 }
                 break;

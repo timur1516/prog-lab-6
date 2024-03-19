@@ -2,11 +2,12 @@ package client.Commands;
 
 import client.Main;
 import common.Constants;
-import common.Exceptions.RecursiveScriptException;
+import common.Exceptions.InvalidDataException;
+import client.Exceptions.RecursiveScriptException;
 import common.Exceptions.WrongAmountOfArgumentsException;
 import common.FileLoader;
 import common.Commands.UserCommand;
-import common.net.requests.ExecuteCommandResponce;
+import common.net.requests.ExecuteCommandResponse;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class ExecuteScriptCommand extends UserCommand {
      * <p> Firstly it initializes super constructor by command name, arguments and description
      */
     public ExecuteScriptCommand() {
-        super("execute_script", "file_name", "read and execute script from given file");
+        super("execute_script", "read and execute script from given file", "file_name");
     }
 
     /**
@@ -40,41 +41,41 @@ public class ExecuteScriptCommand extends UserCommand {
      * <p>Eventually it sets script mode, changes Console inputStream to scriptFile and calls scriptMode
      * <p>Regardless of the result of the script execution Script mode is removed and Console inputString is returned to previous value
      *
-     * @throws Exception If any error occurred while executing script
+     * @return ExecuteCommandResponse Result of executing script file
      */
     @Override
-    public ExecuteCommandResponce execute() {
+    public ExecuteCommandResponse execute() {
 
         File scriptFile;
         try {
             scriptFile = new FileLoader().loadFile(scriptFilePath, "txt", "r", "Script file");
         } catch (FileNotFoundException e) {
-            return new ExecuteCommandResponce(ResultState.EXCEPTION, e);
+            return new ExecuteCommandResponse(ResultState.EXCEPTION, e);
         }
 
         if(!Constants.scriptStack.isEmpty() && Constants.scriptStack.contains(scriptFilePath)){
-            return new ExecuteCommandResponce(ResultState.EXCEPTION, new RecursiveScriptException("Script is recursive!"));
+            return new ExecuteCommandResponse(ResultState.EXCEPTION, new RecursiveScriptException("Script is recursive!"));
         }
 
         Scanner prevScanner = Console.getInstance().getScanner();
         try {
             Console.getInstance().setScanner(new Scanner(new FileInputStream(scriptFile)));
         } catch (FileNotFoundException e) {
-            return new ExecuteCommandResponce(ResultState.EXCEPTION, "Script file reading error!");
+            return new ExecuteCommandResponse(ResultState.EXCEPTION, "Script file reading error!");
         }
 
         Constants.scriptStack.push(scriptFilePath);
 
         Constants.SCRIPT_MODE = true;
 
-        ExecuteCommandResponce responce;
+        ExecuteCommandResponse responce;
 
         try {
             Main.scriptMode();
-            responce = new ExecuteCommandResponce(ResultState.SUCCESS,"Script executed successfully!");
+            responce = new ExecuteCommandResponse(ResultState.SUCCESS,"Script executed successfully!");
         }
         catch (Exception e){
-            responce = new ExecuteCommandResponce(ResultState.EXCEPTION, e);
+            responce = new ExecuteCommandResponse(ResultState.EXCEPTION, e);
         }
         finally {
             Constants.scriptStack.pop();
@@ -91,8 +92,8 @@ public class ExecuteScriptCommand extends UserCommand {
      * @throws WrongAmountOfArgumentsException If number of arguments is not equal to zero
      */
     @Override
-    public void initCommandArgs(ArrayList<Serializable> arguments) throws WrongAmountOfArgumentsException {
-        if(arguments.size() != 1) throw new WrongAmountOfArgumentsException("Wrong amount of arguments!", 1, arguments.size());
+    public void initCommandArgs(ArrayList<Serializable> arguments) throws WrongAmountOfArgumentsException, InvalidDataException {
+        super.initCommandArgs(arguments);
         this.scriptFilePath = (String) arguments.get(0);
     }
 }

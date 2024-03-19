@@ -27,7 +27,7 @@ public class RemoveLowerCommand extends UserCommand {
      * @param workerReader
      */
     public RemoveLowerCommand(WorkerReader workerReader) {
-        super("remove_lower", "{element}", "remove all elements which are lower than given");
+        super("remove_lower", "remove all elements which are lower than given", "{element}");
         this.workerReader = workerReader;
     }
 
@@ -39,33 +39,22 @@ public class RemoveLowerCommand extends UserCommand {
      *
      */
     @Override
-    public ExecuteCommandResponce execute() {
+    public ExecuteCommandResponse execute() {
         try {
             UDPClient.getInstance().sendObject(new ClientRequest(ClientRequestType.IS_COLLECTION_EMPTY, null));
             if ((boolean)(UDPClient.getInstance().receiveObject())) {
                 if (Constants.SCRIPT_MODE) {
                     workerReader.readWorker();
                 }
-                return new ExecuteCommandResponce(ResultState.SUCCESS, "Collection is empty!");
+                return new ExecuteCommandResponse(ResultState.SUCCESS, "Collection is empty!");
             }
             Worker worker = this.workerReader.readWorker();
             ArrayList<Serializable> arguments = new ArrayList<>();
             arguments.add(worker);
             UDPClient.getInstance().sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new PackedCommand(super.getName(), arguments)));
-            return (ExecuteCommandResponce) UDPClient.getInstance().receiveObject();
+            return (ExecuteCommandResponse) UDPClient.getInstance().receiveObject();
         } catch (Exception e){
-            return new ExecuteCommandResponce(ResultState.EXCEPTION, e);
+            return new ExecuteCommandResponse(ResultState.EXCEPTION, e);
         }
-    }
-
-    /**
-     * Method checks if amount arguments is correct
-     *
-     * @param arguments String array with different arguments
-     * @throws WrongAmountOfArgumentsException If number of arguments is not equal to zero
-     */
-    @Override
-    public void initCommandArgs(ArrayList<Serializable> arguments) throws WrongAmountOfArgumentsException {
-        if(!arguments.isEmpty()) throw new WrongAmountOfArgumentsException("Wrong amount of arguments!", 0, arguments.size());
     }
 }

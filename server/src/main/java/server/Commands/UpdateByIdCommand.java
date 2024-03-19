@@ -3,7 +3,8 @@ package server.Commands;
 import common.Collection.Worker;
 import common.Commands.ICommand;
 import common.Commands.UserCommand;
-import common.net.requests.ExecuteCommandResponce;
+import common.Exceptions.InvalidDataException;
+import common.net.requests.ExecuteCommandResponse;
 import common.net.requests.ResultState;
 import server.Controllers.CollectionController;
 
@@ -34,7 +35,9 @@ public class UpdateByIdCommand extends UserCommand {
      * @param collectionController
      */
     public UpdateByIdCommand(CollectionController collectionController) {
-        super("update", "id {element}", "update value of collection element which id is equal to given");
+        super("update",
+                "update value of collection element which id is equal to given",
+                "id", "{element}");
         this.collectionController = collectionController;
     }
 
@@ -46,13 +49,13 @@ public class UpdateByIdCommand extends UserCommand {
      * @throws NoSuchElementException is element with given id was not found
      */
     @Override
-    public ExecuteCommandResponce execute() {
+    public ExecuteCommandResponse execute() {
         if(!this.collectionController.containsId(id)){
-            return new ExecuteCommandResponce(ResultState.EXCEPTION,
+            return new ExecuteCommandResponse(ResultState.EXCEPTION,
                     new NoSuchElementException("No element with such id!"));
         }
         this.collectionController.update(id, worker);
-        return new ExecuteCommandResponce(ResultState.SUCCESS,
+        return new ExecuteCommandResponse(ResultState.SUCCESS,
                 "Element updated successfully!");
     }
 

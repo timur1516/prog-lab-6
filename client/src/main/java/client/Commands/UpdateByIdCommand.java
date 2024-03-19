@@ -6,7 +6,7 @@ import common.Collection.Worker;
 import common.Constants;
 import common.Exceptions.InvalidDataException;
 import common.Exceptions.WrongAmountOfArgumentsException;
-import common.Parsers.WorkerParsers;
+import client.Parsers.WorkerParsers;
 import common.Commands.UserCommand;
 import common.Validators.WorkerValidators;
 import common.net.requests.*;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 /**
- * Class with realization of update command
+ * Class with realization of update command for client
  * <p>This command is used to update value of collection element which id is equal to given
  * @see UserCommand
  */
@@ -36,7 +36,9 @@ public class UpdateByIdCommand extends UserCommand {
      * @param workerReader
      */
     public UpdateByIdCommand(WorkerReader workerReader) {
-        super("update", "id {element}", "update value of collection element which id is equal to given");
+        super("update",
+                "update value of collection element which id is equal to given",
+                "id", "{element}");
         this.workerReader = workerReader;
     }
 
@@ -47,14 +49,14 @@ public class UpdateByIdCommand extends UserCommand {
      * @throws NoSuchElementException is element with given id was not found
      */
     @Override
-    public ExecuteCommandResponce execute() {
+    public ExecuteCommandResponse execute() {
         try {
             UDPClient.getInstance().sendObject(new ClientRequest(ClientRequestType.CHECK_ID, id));
             if (!(boolean)(UDPClient.getInstance().receiveObject())) {
                 if (Constants.SCRIPT_MODE) {
                     workerReader.readWorker();
                 }
-                return new ExecuteCommandResponce(ResultState.EXCEPTION,
+                return new ExecuteCommandResponse(ResultState.EXCEPTION,
                         new NoSuchElementException("No element with such id!"));
             }
             Worker worker = workerReader.readWorker();
@@ -62,9 +64,9 @@ public class UpdateByIdCommand extends UserCommand {
             arguments.add(id);
             arguments.add(worker);
             UDPClient.getInstance().sendObject(new ClientRequest(ClientRequestType.EXECUTE_COMMAND, new PackedCommand(super.getName(), arguments)));
-            return (ExecuteCommandResponce) UDPClient.getInstance().receiveObject();
+            return (ExecuteCommandResponse) UDPClient.getInstance().receiveObject();
         } catch (Exception e){
-            return new ExecuteCommandResponce(ResultState.EXCEPTION, e);
+            return new ExecuteCommandResponse(ResultState.EXCEPTION, e);
         }
     }
 
@@ -77,7 +79,7 @@ public class UpdateByIdCommand extends UserCommand {
      */
     @Override
     public void initCommandArgs(ArrayList<Serializable> arguments) throws WrongAmountOfArgumentsException, InvalidDataException {
-        if (arguments.size() != 1) throw new WrongAmountOfArgumentsException("Wrong amount of arguments!", 1, arguments.size());
+        super.initCommandArgs(arguments);
         this.id = WorkerParsers.longParser.parse((String) arguments.get(0));
         WorkerValidators.idValidator.validate(id);
     }

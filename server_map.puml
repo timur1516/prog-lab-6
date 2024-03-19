@@ -1,0 +1,182 @@
+@startuml
+class server.Commands.SaveCommand {
+- CollectionController collectionController
+- DataFileController dataFileController
++ <<Create>> SaveCommand(CollectionController,DataFileController)
++ ExecuteCommandResponse execute()
+}
+class server.Commands.InfoCommand {
+- CollectionController collectionController
++ <<Create>> InfoCommand(CollectionController)
++ ExecuteCommandResponse execute()
+}
+class server.Commands.UpdateByIdCommand {
+- CollectionController collectionController
+- long id
+~ Worker worker
++ <<Create>> UpdateByIdCommand(CollectionController)
++ ExecuteCommandResponse execute()
++ void initCommandArgs(ArrayList<Serializable>)
+}
+class server.JSON.ZonedDateTimeDeserializer {
++ ZonedDateTime deserialize(JsonElement,Type,JsonDeserializationContext)
+}
+class server.Commands.RemoveByIdCommand {
+- CollectionController collectionController
+- long id
++ <<Create>> RemoveByIdCommand(CollectionController)
++ ExecuteCommandResponse execute()
++ void initCommandArgs(ArrayList<Serializable>)
+}
+class server.Commands.ExitCommand {
+- CommandsController commandsController
++ <<Create>> ExitCommand(CommandsController)
++ ExecuteCommandResponse execute()
+}
+class server.JSON.LocalDateTimeSerializer {
++ JsonElement serialize(LocalDateTime,Type,JsonSerializationContext)
+}
+class server.Main {
++ {static} Logger logger
++ {static} UDPServer server
+- {static} Selector selector
+- {static} CollectionController collectionController
+- {static} CommandsController clientCommandsController
+- {static} CommandsController serverCommandsController
+- {static} DataFileController dataFileController
+- {static} Reader reader
++ {static} void main(String[])
++ {static} void interactiveMode()
+- {static} void askClient()
+- {static} void askAdmin()
+- {static} void handleAdminRequest(PackedCommand)
+- {static} void handleClientRequest(ClientRequest)
+- {static} String readFileName()
+- {static} PriorityQueue<Worker> loadData()
+}
+class server.Controllers.DataFileController {
+- File dataFile
+- Gson gson
++ <<Create>> DataFileController(File)
++ void writeToJSON(PriorityQueue<Worker>)
++ PriorityQueue<Worker> readJSON()
+}
+class server.UDPServer {
+~ DatagramChannel dc
+~ SocketAddress addr
+~ <<Create>> UDPServer(int)
++ void open()
++ void stop()
++ void registerSelector(Selector,int)
+# byte[] receive(int)
+# void send(byte[])
+}
+class server.Commands.RemoveGreaterCommand {
+- CollectionController collectionController
+- Worker worker
++ <<Create>> RemoveGreaterCommand(CollectionController)
++ ExecuteCommandResponse execute()
++ void initCommandArgs(ArrayList<Serializable>)
+}
+class server.Exceptions.ExitingException {
++ <<Create>> ExitingException(String)
+}
+class server.Commands.FilterLessThanEndDateCommand {
+- CollectionController collectionController
+- LocalDateTime endDate
++ <<Create>> FilterLessThanEndDateCommand(CollectionController)
++ ExecuteCommandResponse execute()
++ void initCommandArgs(ArrayList<Serializable>)
+}
+class server.Commands.MinBySalaryCommand {
+- CollectionController collectionController
++ <<Create>> MinBySalaryCommand(CollectionController)
++ ExecuteCommandResponse execute()
+}
+class server.Commands.PrintFieldDescendingSalaryCommand {
+- CollectionController collectionController
++ <<Create>> PrintFieldDescendingSalaryCommand(CollectionController)
++ ExecuteCommandResponse execute()
+}
+class server.Commands.RemoveLowerCommand {
+- CollectionController collectionController
+- Worker worker
++ <<Create>> RemoveLowerCommand(CollectionController)
++ ExecuteCommandResponse execute()
++ void initCommandArgs(ArrayList<Serializable>)
+}
+class server.Commands.ClearCommand {
+- CollectionController collectionController
++ <<Create>> ClearCommand(CollectionController)
++ ExecuteCommandResponse execute()
+}
+class server.JSON.ZonedDateTimeSerializer {
++ JsonElement serialize(ZonedDateTime,Type,JsonSerializationContext)
+}
+class server.JSON.LocalDateTimeDeserializer {
++ LocalDateTime deserialize(JsonElement,Type,JsonDeserializationContext)
+}
+class server.Commands.AddCommand {
+- CollectionController collectionController
+- Worker worker
++ <<Create>> AddCommand(CollectionController)
++ void initCommandArgs(ArrayList<Serializable>)
++ ExecuteCommandResponse execute()
+}
+class server.Controllers.CollectionController {
+- PriorityQueue<Worker> collection
+- LocalDateTime creationDate
+- boolean changeFlag
++ <<Create>> CollectionController(PriorityQueue<Worker>)
++ {static} boolean isValid(PriorityQueue<Worker>)
++ boolean wasChanged()
++ void removeChangeFlag()
++ long generateId()
++ PriorityQueue<Worker> getCollection()
++ LocalDateTime getCreationDate()
++ boolean containsId(long)
++ String getInfo()
++ void add(Worker)
++ void update(long,Worker)
++ void removeById(long)
++ void clear()
++ void removeFirst()
++ int removeGreater(Worker)
++ int removeLower(Worker)
++ Worker getMinBySalary()
++ List<Worker> getLessThanEndDate(LocalDateTime)
++ List<Integer> getDescendingSalaries()
+}
+class server.Commands.RemoveFirstCommand {
+- CollectionController collectionController
++ <<Create>> RemoveFirstCommand(CollectionController)
++ ExecuteCommandResponse execute()
+}
+class server.Commands.ShowCommand {
+- CollectionController collectionController
++ <<Create>> ShowCommand(CollectionController)
++ ExecuteCommandResponse execute()
+}
+
+
+common.Commands.UserCommand <|-- server.Commands.SaveCommand
+common.Commands.UserCommand <|-- server.Commands.InfoCommand
+common.Commands.UserCommand <|-- server.Commands.UpdateByIdCommand
+com.google.gson.JsonDeserializer <|.. server.JSON.ZonedDateTimeDeserializer
+common.Commands.UserCommand <|-- server.Commands.RemoveByIdCommand
+common.Commands.UserCommand <|-- server.Commands.ExitCommand
+com.google.gson.JsonSerializer <|.. server.JSON.LocalDateTimeSerializer
+common.net.NetDataTransferringHandler <|-- server.UDPServer
+common.Commands.UserCommand <|-- server.Commands.RemoveGreaterCommand
+server.Exceptions.Exception <|-- server.Exceptions.ExitingException
+common.Commands.UserCommand <|-- server.Commands.FilterLessThanEndDateCommand
+common.Commands.UserCommand <|-- server.Commands.MinBySalaryCommand
+common.Commands.UserCommand <|-- server.Commands.PrintFieldDescendingSalaryCommand
+common.Commands.UserCommand <|-- server.Commands.RemoveLowerCommand
+common.Commands.UserCommand <|-- server.Commands.ClearCommand
+com.google.gson.JsonSerializer <|.. server.JSON.ZonedDateTimeSerializer
+server.JSON.JsonDeserializer <|.. server.JSON.LocalDateTimeDeserializer
+common.Commands.UserCommand <|-- server.Commands.AddCommand
+common.Commands.UserCommand <|-- server.Commands.RemoveFirstCommand
+common.Commands.UserCommand <|-- server.Commands.ShowCommand
+@enduml

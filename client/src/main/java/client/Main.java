@@ -13,7 +13,7 @@ import client.Readers.WorkerReader;
 import common.UI.CommandReader;
 import common.UI.Console;
 import common.Commands.UserCommand;
-import common.net.requests.ExecuteCommandResponce;
+import common.net.requests.ExecuteCommandResponse;
 import common.net.requests.PackedCommand;
 
 /**
@@ -81,7 +81,7 @@ public class Main {
             Console.getInstance().printLn(packedCommand.commandName());
 
             UserCommand command = commandsController.launchCommand(packedCommand);
-            ExecuteCommandResponce responce = command.execute();
+            ExecuteCommandResponse responce = command.execute();
             switch (responce.state()){
                 case SUCCESS:
                     Console.getInstance().printLn(responce.data());
@@ -110,7 +110,7 @@ public class Main {
                 Console.getInstance().printError(e.getMessage());
                 continue;
             }
-            ExecuteCommandResponce responce = command.execute();
+            ExecuteCommandResponse responce = command.execute();
             switch (responce.state()){
                 case SUCCESS:
                     Console.getInstance().printLn(responce.data());

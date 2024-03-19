@@ -2,7 +2,7 @@ package server.Commands;
 
 import common.Exceptions.WrongAmountOfArgumentsException;
 import common.Commands.UserCommand;
-import common.net.requests.ExecuteCommandResponce;
+import common.net.requests.ExecuteCommandResponse;
 import common.net.requests.ResultState;
 import server.Controllers.CollectionController;
 import server.Controllers.DataFileController;
@@ -42,26 +42,18 @@ public class SaveCommand extends UserCommand {
      * Method to complete save command
      * <p>It gets current collection from collection controller and writes it to data file
      * <p>Also ChangeFlag is set to false
-     *
-     * @throws IOException If an error occurred while writing to file
+     * @return
      */
     @Override
-    public ExecuteCommandResponce execute() {
+    public ExecuteCommandResponse execute() {
         try {
             this.dataFileController.writeToJSON(this.collectionController.getCollection());
             this.collectionController.removeChangeFlag();
-            return new ExecuteCommandResponce(ResultState.SUCCESS,
+            return new ExecuteCommandResponse(ResultState.SUCCESS,
                     "Collection saved successfully!");
         } catch (IOException e) {
-            return new ExecuteCommandResponce(ResultState.EXCEPTION,
+            return new ExecuteCommandResponse(ResultState.EXCEPTION,
                     new IOException("An error occurred while writing to the file!"));
-        }
-    }
-
-    @Override
-    public void initCommandArgs(ArrayList<Serializable> arguments) throws WrongAmountOfArgumentsException {
-        if(!arguments.isEmpty()){
-            throw new WrongAmountOfArgumentsException("Wrong amount of arguments!", 0, arguments.size());
         }
     }
 }
