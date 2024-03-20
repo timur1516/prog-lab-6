@@ -1,0 +1,220 @@
+@startuml
+interface common.Validators.Validator {
+~ void validate(T)
+}
+class common.Exceptions.ReceivingDataException {
++ <<Create>> ReceivingDataException(String)
+}
+enum common.Collection.Country {
++  UNITED_KINGDOM
++  USA
++  VATICAN
+}
+class common.Exceptions.WrongAmountOfArgumentsException {
+- int expectedArguments
+- int givenArguments
+~ String message
++ <<Create>> WrongAmountOfArgumentsException(String,int,int)
++ String getMessage()
+}
+class common.net.requests.ExecuteCommandResponse {
+- ResultState state
+- Serializable data
++ <<Create>> ExecuteCommandResponse(ResultState,Serializable)
++ ResultState state()
++ Serializable data()
+}
+class common.Exceptions.WrongFilePermissionsException {
++ <<Create>> WrongFilePermissionsException(String)
+}
+class common.net.requests.ClientRequest {
+- ClientRequestType type
+- Serializable data
++ <<Create>> ClientRequest(ClientRequestType,Serializable)
++ ClientRequestType type()
++ Serializable data()
+}
+class common.UI.YesNoQuestionAsker {
+~ String question
++ <<Create>> YesNoQuestionAsker(String)
++ boolean ask()
+}
+class common.Constants {
++ {static} boolean SCRIPT_MODE
++ {static} String DATE_FORMAT_STRING
++ {static} String TIME_FROMAT_STRING
++ {static} DateTimeFormatter formatter
++ {static} Stack<String> scriptStack
++ {static} int serverPort
+}
+class common.net.requests.PackedCommand {
+- String commandName
+- ArrayList<Serializable> arguments
++ <<Create>> PackedCommand(String,ArrayList<Serializable>)
++ ArrayList<Serializable> arguments()
++ String commandName()
+}
+class common.Controllers.CommandsController {
+- ArrayList<UserCommand> commandsList
++ void setCommandsList(ArrayList<UserCommand>)
++ ArrayList<UserCommand> getCommandsList()
++ UserCommand launchCommand(PackedCommand)
+}
+class common.UI.Console {
+- {static} Console CONSOLE
+- Scanner scanner
+- <<Create>> Console()
++ {static} Console getInstance()
++ void setScanner(Scanner)
++ Scanner getScanner()
++ String readLine()
++ boolean hasNextLine()
++ void print(Object)
++ void printLn(Object)
++ void printError(String)
+}
+enum common.net.requests.ClientRequestType {
++  EXECUTE_COMMAND
++  CHECK_ID
++  IS_COLLECTION_EMPTY
+}
+class common.Commands.HelpCommand {
+- CommandsController commandsController
++ <<Create>> HelpCommand(CommandsController)
++ ExecuteCommandResponse execute()
+}
+class common.Validators.WorkerValidators {
++ {static} Validator<Worker> workerValidator
++ {static} Validator<Long> idValidator
++ {static} Validator<String> nameValidator
++ {static} Validator<Coordinates> coordinatesValidator
++ {static} Validator<Double> xValidator
++ {static} Validator<Double> yValidator
++ {static} Validator<LocalDateTime> startDateValidator
++ {static} Validator<LocalDateTime> endDateValidator
++ {static} Validator<ZonedDateTime> creationDateValidator
++ {static} Validator<Integer> salaryValidator
++ {static} Validator<Status> statusValidator
++ {static} Validator<Person> personValidator
++ {static} Validator<Long> heightValidator
++ {static} Validator<Color> eyeColorValidator
++ {static} Validator<Country> nationalityValidator
+}
+class common.Collection.Worker {
+- long id
+- String name
+- Coordinates coordinates
+- java.time.ZonedDateTime creationDate
+- Integer salary
+- java.time.LocalDateTime startDate
+- java.time.LocalDateTime endDate
+- Status status
+- Person person
++ <<Create>> Worker(long,String,Coordinates,ZonedDateTime,Integer,LocalDateTime,LocalDateTime,Status,Person)
++ long getId()
++ void setId(long)
++ Integer getSalary()
++ LocalDateTime getEndDate()
++ String getName()
++ Coordinates getCoordinates()
++ ZonedDateTime getCreationDate()
++ LocalDateTime getStartDate()
++ Status getStatus()
++ Person getPerson()
++ void setCreationDate(ZonedDateTime)
++ int compareTo(Worker)
++ String toString()
+}
+abstract class common.net.NetDataTransferringHandler {
++ {abstract}void open()
++ {abstract}void stop()
+- byte[] serialize(Serializable)
+- Serializable deserialize(byte[])
+# {abstract}byte[] receive(int)
+# {abstract}void send(byte[])
++ Serializable receiveObject()
++ void sendObject(Serializable)
+}
+class common.Collection.Coordinates {
+- double x
+- double y
++ <<Create>> Coordinates(double,double)
++ String toString()
++ double getX()
++ double getY()
++ int compareTo(Coordinates)
+}
+enum common.Collection.Color {
++  RED
++  BLUE
++  YELLOW
++  BROWN
+}
+class common.FileLoader {
++ <<Create>> FileLoader()
++ File loadFile(String,String,String,String)
+}
+enum common.Collection.Status {
++  FIRED
++  HIRED
++  REGULAR
++  PROBATION
+}
+class common.Exceptions.SendingDataException {
++ <<Create>> SendingDataException(String)
+}
+class common.Collection.Person {
+- Long height
+- Color eyeColor
+- Country nationality
++ <<Create>> Person(Long,Color,Country)
++ String toString()
++ Long getHeight()
++ Color getEyeColor()
++ Country getNationality()
+}
+interface common.Commands.ICommand {
+~ String getName()
+~ ExecuteCommandResponse execute()
+}
+class common.Exceptions.InvalidDataException {
++ <<Create>> InvalidDataException(String)
+}
+abstract class common.Commands.UserCommand {
+- String name
+- String[] arguments
+- int amountOfArguments
+- String description
++ <<Create>> UserCommand(String,String,String)
+- void countArgs()
++ String getName()
++ void initCommandArgs(ArrayList<Serializable>)
++ String toString()
++ boolean equals(Object)
++ int hashCode()
+}
+class common.UI.CommandReader {
+- {static} CommandReader COMMAND_READER
+- <<Create>> CommandReader()
++ {static} CommandReader getInstance()
++ PackedCommand readCommand()
+}
+enum common.net.requests.ResultState {
++  SUCCESS
++  EXCEPTION
+}
+
+
+common.Exceptions.Exception <|-- common.Exceptions.ReceivingDataException
+common.Exceptions.IllegalArgumentException <|-- common.Exceptions.WrongAmountOfArgumentsException
+java.io.FileNotFoundException <|-- common.Exceptions.WrongFilePermissionsException
+common.Commands.UserCommand <|-- common.Commands.HelpCommand
+common.Collection.Comparable <|.. common.Collection.Worker
+java.io.Serializable <|.. common.Collection.Worker
+common.Collection.Comparable <|.. common.Collection.Coordinates
+java.io.Serializable <|.. common.Collection.Coordinates
+common.Exceptions.Exception <|-- common.Exceptions.SendingDataException
+java.io.Serializable <|.. common.Collection.Person
+common.Exceptions.Exception <|-- common.Exceptions.InvalidDataException
+common.Commands.ICommand <|.. common.Commands.UserCommand
+@enduml

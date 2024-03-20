@@ -23,7 +23,7 @@ jar{
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     manifest {
-        attributes 'Main-Class' : 'ru.timur.Main'
+        attributes 'Main-Class' : 'server.Main'
     }
 
     from{

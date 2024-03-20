@@ -1,5 +1,6 @@
 package client;
 
+import common.Exceptions.ReceivingDataException;
 import common.net.NetDataTransferringHandler;
 
 import java.io.*;
@@ -71,6 +72,16 @@ public class UDPClient extends NetDataTransferringHandler {
         DatagramPacket dp = new DatagramPacket(arr, len);
         this.ds.receive(dp);
         return arr;
+    }
+
+    @Override
+    public Serializable receiveObject() throws ReceivingDataException {
+        try {
+            return super.receiveObject();
+        }catch (ReceivingDataException e){
+            throw new ReceivingDataException("Server unavailable!");
+        }
+
     }
 
     @Override
